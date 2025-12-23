@@ -47,12 +47,6 @@ bool ReliableRouter::shouldFilterReceived(const meshtastic_MeshPacket *p)
     if (p->from == getNodeNum()) {
         printPacket("Rx someone rebroadcasting for us", p);
 
-        if (p->relay_node != 0) {
-           LOG_DEBUG("REBROADCAST_BY=0x%02X", p->relay_node);
-        } else {
-            LOG_DEBUG("REBROADCAST RELAY NODE ZERO ", p->relay_node);
-        }
-
         // We are seeing someone rebroadcast one of our broadcast attempts.
         // If this is the first time we saw this, cancel any retransmissions we have queued up and generate an internal ack for
         // the original sending process.
@@ -156,7 +150,9 @@ void ReliableRouter::sniffReceived(const meshtastic_MeshPacket *p, const meshtas
         PacketId nakId = (c && c->error_reason != meshtastic_Routing_Error_NONE) ? p->decoded.request_id : 0;
 
         // We intentionally don't check wasSeenRecently, because it is harmless to delete non existent retransmission records
-        if (ackId || nakId) {
+        if ((ackId || nakId) &&
+            // Implicit ACKs from MQTT should not stop retransmissions
+            !(isFromUs(p) && p->transport_mechanism == meshtastic_MeshPacket_TransportMechanism_TRANSPORT_MQTT)) {
             LOG_DEBUG("Received a %s for 0x%x, stopping retransmissions", ackId ? "ACK" : "NAK", ackId);
             if (ackId) {
                 stopRetransmission(p->to, ackId);
