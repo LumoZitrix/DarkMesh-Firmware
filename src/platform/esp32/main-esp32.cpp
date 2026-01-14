@@ -261,10 +261,10 @@ void cpuDeepSleep(uint32_t msecToWake)
 
     uint64_t micro_secs = msecToWake * 1000ULL;
 
-#if defined(CONFIG_IDF_TARGET_ESP32S3) && defined(FORCE_SHUTDOWN_LOWPOWER)
+#if defined(HELTEC_V3) && defined(FORCE_SHUTDOWN_LOWPOWER)
     if (msecToWake != portMAX_DELAY) {
         /*
-         * ESP32-S3 deep sleep timer workaround:
+         * Heltec V3 deep sleep timer workaround:
          * Even with RTC slow clock sourced from 32.768 kHz XTAL
          * (rtc_clk_slow_freq_get() == RTC_SLOW_FREQ_32K_XTAL),
          * esp_sleep_enable_timer_wakeup() wakes ~4x later than requested.
@@ -272,7 +272,7 @@ void cpuDeepSleep(uint32_t msecToWake)
          * This has been verified by measurement on Heltec V3.
          * Likely an ESP-IDF S3 RTC timer scaling issue.
         */
-        micro_secs /= 4;   // esp32 compensation if different than max
+        micro_secs /= 4;
     }
 #endif
 
