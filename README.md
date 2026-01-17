@@ -1,18 +1,14 @@
-# DarkMesh Firmware
+<p align="center">
+ DarkMesh Firmware - 
+  All credits about the architecture and the firmware design goes to Meshtastic.
+</p>
 
-![GitHub release downloads](https://img.shields.io/github/downloads/meshtastic/firmware/total)
-[![CI](https://img.shields.io/github/actions/workflow/status/meshtastic/firmware/main_matrix.yml?branch=master&label=actions&logo=github&color=yellow)](https://github.com/meshtastic/firmware/actions/workflows/ci.yml)
-[![CLA assistant](https://cla-assistant.io/readme/badge/meshtastic/firmware)](https://cla-assistant.io/meshtastic/firmware)
-[![Fiscal Contributors](https://opencollective.com/meshtastic/tiers/badge.svg?label=Fiscal%20Contributors&color=deeppink)](https://opencollective.com/meshtastic/)
-[![Vercel](https://img.shields.io/static/v1?label=Powered%20by&message=Vercel&style=flat&logo=vercel&color=000000)](https://vercel.com?utm_source=meshtastic&utm_campaign=oss)
+<p align="center">
+  An independent firmware development from Meshtastic LLC. focused on Privacy and Field Operators.
+  Licensed under <b>GPL-3.0</b>.
+</p>
 
-## Overview
-
-This repository contains the device firmware for the Meshtastic project.
-
-- **[Building Instructions](https://meshtastic.org/docs/development/firmware/build)**
-- **[Flashing Instructions](https://meshtastic.org/docs/getting-started/flashing-firmware/)**
-
-## Stats
-
-![Alt](https://repobeats.axiom.co/api/embed/a92f097d9197ae853e780ec53d7d126e545629ab.svg "Repobeats analytics image")
+<p align="center">
+The Android application and the Darkmesh firmware are provided without any guarantee of operation or reliability, neither express nor implied. Use takes place under the user’s sole responsibility. The author of the software declines all responsibility for any violations of regulations, as well as for direct, indirect, incidental, or consequential damages arising from the use, misuse, or inability to use the software.
+Use of the software entails the implicit acceptance of the conditions indicated above.
+</p>
