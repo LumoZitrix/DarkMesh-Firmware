@@ -135,7 +135,11 @@ void setupModules()
 #if !MESHTASTIC_EXCLUDE_TEXTMESSAGE
     textMessageModule = new TextMessageModule();
 #endif
+
+#ifdef DM_CONSOLE_MODULE
     consoleModule = new ConsoleModule();
+#endif
+
 #if !MESHTASTIC_EXCLUDE_TRACEROUTE
     traceRouteModule = new TraceRouteModule();
 #endif
