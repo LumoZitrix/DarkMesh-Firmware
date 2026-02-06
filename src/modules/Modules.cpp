@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "ConsoleModule.h"
 #if !MESHTASTIC_EXCLUDE_INPUTBROKER
 #include "buzz/BuzzerFeedbackThread.h"
 #include "input/ExpressLRSFiveWay.h"
@@ -134,6 +135,7 @@ void setupModules()
 #if !MESHTASTIC_EXCLUDE_TEXTMESSAGE
     textMessageModule = new TextMessageModule();
 #endif
+    consoleModule = new ConsoleModule();
 #if !MESHTASTIC_EXCLUDE_TRACEROUTE
     traceRouteModule = new TraceRouteModule();
 #endif
