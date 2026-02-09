@@ -50,7 +50,6 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
         LOG_INFO("message from no-authorized keys");
         return ProcessMessage::CONTINUE;
     }
-    LOG_INFO("message from authorized keys");
 
     if (strncmp(reinterpret_cast<const char *>(p.payload.bytes),"+++",3)==0) {
         command_state = !command_state;
@@ -66,7 +65,6 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
         std::string route = "Nodes:\n";
         for (size_t i = 1; i < nodeDatabase.nodes.size(); i++) {
             const auto &entry = nodeDatabase.nodes[i];
-
             if (entry.hops_away == 0) {
                 route += vformat("%s: '%s' snr: %f\n", entry.user.short_name, entry.user.long_name, entry.snr);
                 if (! --max_nodes) break;
@@ -77,18 +75,14 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
         // telemetry
         meshtastic_Telemetry m = meshtastic_Telemetry_init_zero;
         m.which_variant = meshtastic_Telemetry_environment_metrics_tag;
-        // c'è il modulo ?
-
-        MeshModule *mesh_module;
-        mesh_module = MeshModule::getModule("EnvironmentTelemetry");
-        if (mesh_module == nullptr) {
-            this->sendText(mp.from,0, "environment telemetry not enabled!", false);
+        // check if module is loaded
+        auto* environment_telemetry_module = (EnvironmentTelemetryModule*)MeshModule::getModule("EnvironmentTelemetry");
+        if (!environment_telemetry_module) {
+            sendText(mp.from, 0, "environment telemetry not enabled!", false);
             return ProcessMessage::CONTINUE;
         }
-        EnvironmentTelemetryModule * environment_telemetry_module;
-        environment_telemetry_module = (EnvironmentTelemetryModule *) mesh_module;
         if (environment_telemetry_module->extGetEnvironmentTelemetry(&m)) {
-            std::string msg = "Telemetry:\n";
+            std::string msg = "Environment:\n";
             if (m.variant.environment_metrics.has_temperature) {
                 msg+=vformat("T : %f\n", m.variant.environment_metrics.temperature);
             }
@@ -100,13 +94,22 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
             }
             this->sendText(mp.from,0, msg.c_str(), false);
         }
-        mesh_module = MeshModule::getModule("PowerTelemetry");
-        if (mesh_module == nullptr) {
-            this->sendText(mp.from,0, "power telemetry not enabled!", false);
+        auto* power_telemetry_module = (PowerTelemetryModule *) MeshModule::getModule("PowerTelemetry");
+        if (!power_telemetry_module) {
+            sendText(mp.from, 0, "power telemetry not enabled!", false);
             return ProcessMessage::CONTINUE;
         }
-        // get and send power telemetry
-
+        m = meshtastic_Telemetry_init_zero;
+        m.which_variant = meshtastic_Telemetry_power_metrics_tag;
+        if (power_telemetry_module->extGetPowerTelemetry(&m)) {
+            std::string msg = "Power:\n";
+            if (m.variant.power_metrics.has_ch3_voltage) {
+                msg+=vformat("V3 : %f\n", m.variant.power_metrics.ch3_voltage);
+            }
+            if (m.variant.power_metrics.has_ch3_current) {
+                msg+=vformat("I3: %f\n", m.variant.power_metrics.ch3_current);
+            }
+        }
     } else if (p.payload.size>0 and p.payload.bytes[0]=='C') {
         // nodi preferiti C? = lista, C+<id>, aggiunge, C-<id> toglie
         LOG_INFO("Favorites");
