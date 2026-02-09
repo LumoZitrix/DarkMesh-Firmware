@@ -21,9 +21,12 @@
 #define SCREEN_TRANSITION_FRAMERATE 5
 #define BRIGHTNESS_DEFAULT 130 // Medium Low Brightness
 #define USE_TFTDISPLAY 1
+#define HAS_PHYSICAL_KEYBOARD 1
 
 #define I2C_SDA SDA
 #define I2C_SCL SCL
+
+#define HAS_DRV2605 1
 
 #define USE_POWERSAVE
 #define SLEEP_TIME 120
@@ -37,7 +40,6 @@
 
 // PCF85063 RTC Module
 #define PCF85063_RTC 0x51
-#define HAS_RTC 1
 
 // Rotary
 #define ROTARY_A (40)
@@ -58,7 +60,6 @@
 #define I2C_NO_RESCAN
 #define KB_BL_PIN 46
 #define KB_INT 6
-#define CANNED_MESSAGE_MODULE_ENABLE 1
 
 // audio codec ES8311
 #define HAS_I2S

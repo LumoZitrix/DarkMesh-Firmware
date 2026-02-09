@@ -41,18 +41,6 @@ extern "C" {
 #define NUM_ANALOG_INPUTS (1)
 #define NUM_ANALOG_OUTPUTS (0)
 
-// LEDs
-#define PIN_LED1 (-1)
-#define PIN_LED2 (-1)
-#define PIN_LED3 (-1)
-
-#define LED_RED PIN_LED3
-#define LED_BLUE PIN_LED1
-#define LED_GREEN PIN_LED2
-
-#define LED_BUILTIN LED_BLUE
-#define LED_CONN PIN_GREEN
-
 #define LED_STATE_ON 0 // State when LED is lit
 
 /*
@@ -130,18 +118,17 @@ External serial flash W25Q16JV_IQ
 #define GPS_L76K
 
 #define PIN_GPS_STANDBY (0 + 13) // An output to wake GPS, low means allow sleep, high means force wake STANDBY
-#define PIN_GPS_TX (0 + 10)      // This is for bits going TOWARDS the CPU
-#define PIN_GPS_RX (0 + 9)       // This is for bits going TOWARDS the GPS
+#define GPS_TX_PIN (0 + 10)      // This is for bits going FROM the CPU
+#define GPS_RX_PIN (0 + 9)       // This is for bits going FROM the GPS
 
 // #define GPS_THREAD_INTERVAL 50
 
-#define PIN_SERIAL1_TX PIN_GPS_TX
-#define PIN_SERIAL1_RX PIN_GPS_RX
+#define PIN_SERIAL1_TX GPS_TX_PIN
+#define PIN_SERIAL1_RX GPS_RX_PIN
 
 // PCF8563 RTC Module
 #define PIN_RTC_INT (0 + 14) // Interrupt from the PCF8563 RTC
 #define PCF8563_RTC 0x51
-#define HAS_RTC 1
 
 /*
  * SPI Interfaces
@@ -152,8 +139,6 @@ External serial flash W25Q16JV_IQ
 #define PIN_SPI_MISO (32 + 9)
 #define PIN_SPI_MOSI (0 + 11)
 #define PIN_SPI_SCK (0 + 12)
-
-// #define PIN_PWR_EN (0 + 6)
 
 // To debug via the segger JLINK console rather than the CDC-ACM serial device
 // #define USE_SEGGER
