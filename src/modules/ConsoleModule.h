@@ -3,7 +3,7 @@
 #include "SinglePortModule.h"
 
 /**
- * Text message handling for meshtastic - draws on the OLED display the most recent received message
+ * Console message handling
  */
 class ConsoleModule : public SinglePortModule, public Observable<const meshtastic_MeshPacket *>
 {
@@ -13,6 +13,7 @@ class ConsoleModule : public SinglePortModule, public Observable<const meshtasti
      */
     ConsoleModule() : SinglePortModule("text", meshtastic_PortNum_TEXT_MESSAGE_APP) {}
     void sendText(NodeNum dest, ChannelIndex channel, const char *message, bool wantReplies);
+    bool command_state=false;
 
   protected:
     /** Called to handle a particular incoming message

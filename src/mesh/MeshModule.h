@@ -75,6 +75,8 @@ class MeshModule
      */
     static void callModules(meshtastic_MeshPacket &mp, RxSource src = RX_SRC_RADIO);
 
+    static MeshModule *getModule(const char *name);
+
     static std::vector<MeshModule *> GetMeshModulesWithUIFrames(int startIndex);
     static void observeUIEvents(Observer<const UIFrameEvent *> *observer);
     static AdminMessageHandleResult handleAdminMessageForAllModules(const meshtastic_MeshPacket &mp,

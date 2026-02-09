@@ -263,6 +263,18 @@ std::vector<MeshModule *> MeshModule::GetMeshModulesWithUIFrames(int startIndex)
     return modulesWithUIFrames;
 }
 
+MeshModule * MeshModule::getModule(const char *name) {
+    if (modules) {
+        for (auto i = modules->begin(); i != modules->end(); ++i) {
+            auto &pi = **i;
+            if (! strcmp(pi.name, name)) {
+                return &pi;
+            }
+        }
+    }
+    return nullptr;
+}
+
 void MeshModule::observeUIEvents(Observer<const UIFrameEvent *> *observer)
 {
     if (modules) {
