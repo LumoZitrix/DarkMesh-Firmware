@@ -84,15 +84,15 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
         if (environment_telemetry_module->extGetEnvironmentTelemetry(&m)) {
             std::string msg = "Environment:\n";
             if (m.variant.environment_metrics.has_temperature) {
-                msg+=vformat("T : %f\n", m.variant.environment_metrics.temperature);
+                msg+=vformat(" T : %f\n", m.variant.environment_metrics.temperature);
             }
             if (m.variant.environment_metrics.has_relative_humidity) {
                 msg+=vformat("RH: %f\n", m.variant.environment_metrics.relative_humidity);
             }
             if (m.variant.environment_metrics.has_barometric_pressure) {
-                msg+=vformat("RH: %f\n", m.variant.environment_metrics.barometric_pressure);
+                msg+=vformat(" P: %f\n", m.variant.environment_metrics.barometric_pressure);
             }
-            this->sendText(mp.from,0, msg.c_str(), false);
+            sendText(mp.from,0, msg.c_str(), false);
         }
         auto* power_telemetry_module = (PowerTelemetryModule *) MeshModule::getModule("PowerTelemetry");
         if (!power_telemetry_module) {
@@ -109,8 +109,8 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
             if (m.variant.power_metrics.has_ch3_current) {
                 msg+=vformat("I3: %f\n", m.variant.power_metrics.ch3_current);
             }
+            sendText(mp.from,0, msg.c_str(), false);
         }
-
     } else if (p.payload.size>0 and p.payload.bytes[0]=='C') {
         // nodi preferiti C? = lista, C+<id>, aggiunge, C-<id> toglie
         LOG_INFO("Favorites");

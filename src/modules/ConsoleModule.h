@@ -14,7 +14,8 @@ class ConsoleModule : public SinglePortModule, public Observable<const meshtasti
     ConsoleModule() : SinglePortModule("console", meshtastic_PortNum_TEXT_MESSAGE_APP) {
       LOG_INFO("console module");
     }
-    void sendText(NodeNum dest, ChannelIndex channel, const char *message, bool wantReplies);
+
+    static void sendText(NodeNum dest, ChannelIndex channel, const char *message, bool wantReplies);
     bool command_state=false;
 
   protected:
