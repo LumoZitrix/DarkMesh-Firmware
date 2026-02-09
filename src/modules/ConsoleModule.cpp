@@ -57,7 +57,7 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
     if (!command_state) return ProcessMessage::CONTINUE;
 
     if (p.payload.size>0 and p.payload.bytes[0]=='H') {
-        this->sendText(mp.from,0, "Hello from firmware!", false);
+        sendText(mp.from,0, "Hello from firmware!", false);
     } else if (p.payload.size>0 and p.payload.bytes[0]=='N') {
         LOG_INFO("Nodes");
         // 0 = ourself
@@ -70,7 +70,7 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
                 if (! --max_nodes) break;
             }
         }
-        this->sendText(mp.from,0, route.c_str(), false);
+        sendText(mp.from,0, route.c_str(), false);
     } else if (p.payload.size>0 and p.payload.bytes[0]=='T') {
         // telemetry
         meshtastic_Telemetry m = meshtastic_Telemetry_init_zero;
@@ -123,7 +123,7 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
                     msg += vformat("!%08x: '%s'\n", entry.num, entry.user.short_name);
                 }
             }
-            this->sendText(mp.from,0, msg.c_str(), false);
+            sendText(mp.from,0, msg.c_str(), false);
         } else if (p.payload.size==10) {
             // C+<hex id>
             // parse hex id
@@ -147,7 +147,7 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
                     msg += vformat("!%08x: '%s'\n", entry.num, entry.user.short_name);
                 }
             }
-            this->sendText(mp.from,0, msg.c_str(), false);
+            sendText(mp.from,0, msg.c_str(), false);
         } else if (p.payload.size==10) {
             auto new_bl_id =  static_cast<uint32_t>(strtoul(reinterpret_cast<const char *>(p.payload.bytes+2), nullptr, 16));
             meshtastic_NodeInfoLite *node = nodeDB->getMeshNode(new_bl_id);
