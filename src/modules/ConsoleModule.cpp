@@ -110,6 +110,7 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
                 msg+=vformat("I3: %f\n", m.variant.power_metrics.ch3_current);
             }
         }
+
     } else if (p.payload.size>0 and p.payload.bytes[0]=='C') {
         // nodi preferiti C? = lista, C+<id>, aggiunge, C-<id> toglie
         LOG_INFO("Favorites");
