@@ -1,5 +1,6 @@
 #include "configuration.h"
 #include "ConsoleModule.h"
+#include "HunterModule.h"
 #if !MESHTASTIC_EXCLUDE_INPUTBROKER
 #include "buzz/BuzzerFeedbackThread.h"
 #include "input/ExpressLRSFiveWay.h"
@@ -139,6 +140,7 @@ void setupModules()
 #if DM_CONSOLE_MODULE
     consoleModule = new ConsoleModule();
 #endif
+    hunterModule = new HunterModule();
 
 #if !MESHTASTIC_EXCLUDE_TRACEROUTE
     traceRouteModule = new TraceRouteModule();

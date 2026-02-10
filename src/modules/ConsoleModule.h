@@ -5,7 +5,7 @@
 /**
  * Console message handling
  */
-class ConsoleModule : public SinglePortModule, public Observable<const meshtastic_MeshPacket *>
+class ConsoleModule : public SinglePortModule
 {
   public:
     /** Constructor
