@@ -139,8 +139,9 @@ void setupModules()
 
 #if DM_CONSOLE_MODULE
     consoleModule = new ConsoleModule();
-#endif
     hunterModule = new HunterModule();
+#endif
+
 
 #if !MESHTASTIC_EXCLUDE_TRACEROUTE
     traceRouteModule = new TraceRouteModule();
