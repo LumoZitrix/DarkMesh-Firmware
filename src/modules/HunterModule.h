@@ -14,15 +14,14 @@ class HunterModule : public ProtobufModule<meshtastic_RouteDiscovery>,private co
 
   public:
     HunterModule();
-
+    bool enabled = false;
+    unsigned int trace_interval = 30000; // traceroute interval in milliseconds
 
   protected:
-    unsigned int my_interval = 10000; // interval in millisconds
     virtual int32_t runOnce() override;
-
     static void launch(NodeNum node);
     bool handleReceivedProtobuf(const meshtastic_MeshPacket &mp, meshtastic_RouteDiscovery *r) override;
-
+    void printRoute(meshtastic_RouteDiscovery *r, uint32_t origin, uint32_t dest, bool isTowardsDestination);
 };
 
 extern HunterModule *hunterModule;
