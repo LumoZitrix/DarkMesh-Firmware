@@ -17,6 +17,7 @@ class ConsoleModule : public SinglePortModule
 
     static void sendText(NodeNum dest, ChannelIndex channel, const char *message, bool wantReplies);
     bool command_state=false;
+    NodeNum controlling_node=0; // id del nodo controllante, o 0 se nessuno sta controllando il nodo
 
   protected:
     /** Called to handle a particular incoming message

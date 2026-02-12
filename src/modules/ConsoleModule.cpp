@@ -1,6 +1,7 @@
 #include "ConsoleModule.h"
 #include "MeshService.h"
 #include "MeshModule.h"
+#include "HunterModule.h"
 #include "Telemetry/EnvironmentTelemetry.h"
 #include "Telemetry/PowerTelemetry.h"
 #include "NodeDB.h"
@@ -50,15 +51,50 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
         LOG_INFO("message from no-authorized keys");
         return ProcessMessage::CONTINUE;
     }
+    // Copy payload into a null‑terminated buffer
+    char buf[260] = {};
+    size_t n = mp.decoded.payload.size;
+    if (n > sizeof(buf) - 1)
+        n = sizeof(buf) - 1;
+    memcpy(buf, mp.decoded.payload.bytes, n);
 
-    if (strncmp(reinterpret_cast<const char *>(p.payload.bytes),"+++",3)==0) {
-        command_state = !command_state;
+    if (strcmp(buf,"+++")==0) {
+        command_state = true;
+    }
+    if (strcmp(buf,"---")==0) {
+        command_state = false;
+        controlling_node = 0;
     }
     if (!command_state) return ProcessMessage::CONTINUE;
+    controlling_node = mp.from;
 
-    if (p.payload.size>0 and p.payload.bytes[0]=='H') {
-        sendText(mp.from,0, "Hello from firmware!", false);
-    } else if (p.payload.size>0 and p.payload.bytes[0]=='N') {
+    if (strcmp(buf,"H")==0) {
+        std::string msg = vformat("Hello! (snr=%f, rssi=%f)", mp.rx_snr, mp.rx_rssi);
+        sendText(mp.from,0, msg.c_str(), false);
+    } else if (strncmp(buf,"Hunt",4)==0) {
+        bool report_status=false;
+        if (p.payload.size ==4) {
+            report_status=true;
+        } else if (p.payload.size >5 and p.payload.bytes[4]==' ') {
+            if (strcmp(buf+5,"on")==0) {
+                hunterModule->enabled = true;
+                report_status=true;
+            } else if (strcmp(buf+5,"off")==0) {
+                hunterModule->enabled = false;
+                report_status=true;
+            } else if ((strncmp(buf+5,"delay", 5)==0) and (p.payload.size >11) and (p.payload.bytes[10]==' ')) {
+                uint32_t delay = strtoul(buf+11, nullptr, 10) * 1000;
+                hunterModule->trace_interval = delay;
+                report_status=true;
+            }
+        }
+        if (report_status) {
+            std::string msg = vformat("Hunter is %s, delay: %u mSec", hunterModule->enabled?"on":"off",hunterModule->trace_interval);
+            sendText(mp.from,0, msg.c_str(), false);
+        }
+
+    } else if (strcmp(buf,"N")==0) {
+        // show some direct nodes, for debug only
         LOG_INFO("Nodes");
         // 0 = ourself
         uint16_t max_nodes=4;
@@ -71,7 +107,7 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
             }
         }
         sendText(mp.from,0, route.c_str(), false);
-    } else if (p.payload.size>0 and p.payload.bytes[0]=='T') {
+    } else if (strcmp(buf,"T")==0) {
         // telemetry
         meshtastic_Telemetry m = meshtastic_Telemetry_init_zero;
         m.which_variant = meshtastic_Telemetry_environment_metrics_tag;
@@ -111,8 +147,8 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
             }
             sendText(mp.from,0, msg.c_str(), false);
         }
-    } else if (p.payload.size>0 and p.payload.bytes[0]=='C') {
-        // nodi preferiti C? = lista, C+<id>, aggiunge, C-<id> toglie
+    } else if (strncmp(buf,"C",1)==0) {
+        // nodi preferiti C = lista, C+<id>, aggiunge, C-<id> toglie
         LOG_INFO("Favorites");
         if (p.payload.size==1) {
             // only C = list
@@ -124,10 +160,9 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
                 }
             }
             sendText(mp.from,0, msg.c_str(), false);
-        } else if (p.payload.size==10) {
-            // C+<hex id>
-            // parse hex id
-            auto new_favorite_id =  static_cast<uint32_t>(strtoul(reinterpret_cast<const char *>(p.payload.bytes+2), nullptr, 16));
+        } else {
+            // parse id with strtoul
+            auto new_favorite_id =  static_cast<uint32_t>(strtoul(buf+2, nullptr, 0));
             bool set = (p.payload.bytes[1] == '+');
             if (set || p.payload.bytes[1] == '-') {
                 nodeDB->set_favorite(set, new_favorite_id);
@@ -136,7 +171,7 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
                 sendText(mp.from, 0, msg.c_str(), false);
             }
         }
-    } else if (p.payload.size>0 and p.payload.bytes[0]=='B') {
+    } else if (strncmp(buf,"B",1)==0) {
         // blacklist
         if (p.payload.size==1) {
             // list
@@ -148,8 +183,8 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
                 }
             }
             sendText(mp.from,0, msg.c_str(), false);
-        } else if (p.payload.size==10) {
-            auto new_bl_id =  static_cast<uint32_t>(strtoul(reinterpret_cast<const char *>(p.payload.bytes+2), nullptr, 16));
+        } else {
+            auto new_bl_id =  static_cast<uint32_t>(strtoul(buf+2, nullptr, 0));
             meshtastic_NodeInfoLite *node = nodeDB->getMeshNode(new_bl_id);
             if (node==nullptr) {
                 sendText(mp.from, 0, "node not found in db", false);
@@ -164,9 +199,7 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
                 sendText(mp.from, 0, msg.c_str(), false);
             }
         }
-
     }
-
     return ProcessMessage::CONTINUE; // Let others look at this message also if they want
 }
 
