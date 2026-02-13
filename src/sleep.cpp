@@ -214,6 +214,11 @@ void doDeepSleep(uint32_t msecToWake, bool skipPreflight = false, bool skipSaveN
     msecToWake = FORCE_SHUTDOWN_SLEEP_MS;
     skipPreflight = false;
     skipSaveNodeDb = false;
+
+#ifdef ARCH_NRF52
+    skipPreflight = true;
+#endif
+
 #endif
 
     if (INCLUDE_vTaskSuspend && (msecToWake == portMAX_DELAY)) {
