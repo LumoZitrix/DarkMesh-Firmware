@@ -24,8 +24,19 @@ HunterModule::HunterModule()
 
 int32_t HunterModule::runOnce()
 {
-
-    if (!enabled) return 2000;
+    if (!enabled) {
+        // prende in prestito la conf di rangetest in modo che posso settare direttamente il
+        // nodo locale anche col BT
+        // in tal caso il rangetest module non viene mai attivato
+        if (!moduleConfig.range_test.enabled)
+            return 2000;
+        else {
+            trace_interval = moduleConfig.range_test.sender*1000;
+        }
+    }
+    if (trace_interval<15000) {
+        trace_interval = 15000;
+    }
 
     if (firstTime) {
         // do something the first time we run

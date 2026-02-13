@@ -31,7 +31,7 @@ uint32_t packetSequence = 0;
 
 int32_t RangeTestModule::runOnce()
 {
-#if defined(ARCH_ESP32) || defined(ARCH_NRF52) || defined(ARCH_STM32WL) || defined(ARCH_PORTDUINO)
+#if (defined(ARCH_ESP32) || defined(ARCH_NRF52) || defined(ARCH_STM32WL) || defined(ARCH_PORTDUINO)) && !DM_CONSOLE_MODULE
 
     /*
         Uncomment the preferences below if you want to use the module
@@ -48,7 +48,6 @@ int32_t RangeTestModule::runOnce()
 
     uint32_t senderHeartbeat = moduleConfig.range_test.sender * 1000;
     if (moduleConfig.range_test.enabled) {
-
         if (firstTime) {
             rangeTestModuleRadio = new RangeTestModuleRadio();
 
