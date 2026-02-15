@@ -797,6 +797,26 @@ void Power::shutdown()
 #endif
 }
 
+uint16_t Power::getLastVoltageRead() {
+    return batteryLevel ? batteryLevel->getBattVoltage() : 0;
+}
+
+bool Power::isBatteryCharging() {
+    return batteryLevel ? batteryLevel->isCharging() : false;
+}
+
+bool Power::isUsbPowered() {
+    return batteryLevel ? batteryLevel->isVbusIn() : false;
+}
+
+bool Power::isBatteryConnect() {
+    return batteryLevel ? batteryLevel->isBatteryConnect() : false;
+}
+
+uint8_t Power::getLastBattPercentRead() {
+    return batteryLevel ? batteryLevel->getBatteryPercent() : 0;
+}
+
 /// Reads power status to powerStatus singleton.
 //
 // TODO(girts): move this and other axp stuff to power.h/power.cpp.

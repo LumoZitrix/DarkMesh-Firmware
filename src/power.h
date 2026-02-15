@@ -118,6 +118,11 @@ class Power : private concurrency::OSThread
     virtual int32_t runOnce() override;
     void setStatusHandler(meshtastic::PowerStatus *handler) { statusHandler = handler; }
     const uint16_t OCV[11] = {OCV_ARRAY};
+    static uint16_t getLastVoltageRead();
+    static bool isUsbPowered();
+    static bool isBatteryCharging();
+    static bool isBatteryConnect();
+    static uint8_t getLastBattPercentRead();
 
   protected:
     meshtastic::PowerStatus *statusHandler;

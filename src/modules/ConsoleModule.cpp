@@ -6,9 +6,10 @@
 #include "NodeDB.h"
 #include "configuration.h"
 #include "graphics/Screen.h"
+#include "Power.h"
 
 ConsoleModule *consoleModule;
-
+extern Power *power;
 
 void ConsoleModule::sendText(NodeNum dest, ChannelIndex channel, const char *message, bool wantReplies)
 {
@@ -165,6 +166,32 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp)
             }
         }
 
+    } else if (p.payload.size>0 and p.payload.bytes[0]=='V') {
+        //voltage and battery stats
+        if (!power) {
+            sendText(mp.from, 0, "Power manager not ready", false);
+            return ProcessMessage::CONTINUE;
+        }
+
+        uint16_t voltage = power->getLastVoltageRead();
+        uint8_t battPercent = power->getLastBattPercentRead();
+
+        //FIXME these params seem to be not evaluated correctly
+        //eg. when the device is charging, it does not show as charging
+
+        //bool charging = power->isBatteryCharging();
+        //bool usbPowered = power->isUsbPowered();
+        //bool batteryConnected = power->isBatteryConnect();
+
+        std::string msg = "Battery:\n";
+        msg += vformat("VLT: %u mV\n", voltage);
+        msg += vformat("PRC: %u%%\n", battPercent);
+
+        //msg += vformat("CHG: %s\n", charging ? "Y" : "N");
+        //msg += vformat("USB PWR: %s\n", usbPowered ? "Y" : "N");
+        //msg += vformat("BATT CONN: %s\n", batteryConnected ? "Y" : "N");
+
+        sendText(mp.from, 0, msg.c_str(), false);
     }
 
     return ProcessMessage::CONTINUE; // Let others look at this message also if they want
