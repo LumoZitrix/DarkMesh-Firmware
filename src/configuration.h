@@ -422,6 +422,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define FORCE_SHUTDOWN_LOWPOWER 1 
 //#define STEALTH_MODE 1
 #define DM_CONSOLE_MODULE 1
+#define DM_ZERO_COST_HOP_MODULE 1
 
 // #define MESHTASTIC_MINIMIZE_BUILD 1
 #ifdef MESHTASTIC_MINIMIZE_BUILD

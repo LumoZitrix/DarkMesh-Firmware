@@ -1,5 +1,6 @@
 #include "configuration.h"
 #include "ConsoleModule.h"
+#include "ZeroCostHopModule.h"
 #if !MESHTASTIC_EXCLUDE_INPUTBROKER
 #include "buzz/BuzzerFeedbackThread.h"
 #include "input/ExpressLRSFiveWay.h"
@@ -138,6 +139,10 @@ void setupModules()
 
 #if DM_CONSOLE_MODULE
     consoleModule = new ConsoleModule();
+#endif
+
+#if DM_ZERO_COST_HOP_MODULE
+    zeroCostHopModule = new ZeroCostHopModule();
 #endif
 
 #if !MESHTASTIC_EXCLUDE_TRACEROUTE
