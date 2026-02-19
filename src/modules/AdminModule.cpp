@@ -292,8 +292,10 @@ bool AdminModule::handleReceivedProtobuf(const meshtastic_MeshPacket &mp, meshta
         //  CLIENT_BASE, ROUTER and ROUTER_LATE are able to preserve the remaining hop count when relaying a packet via a
         //  favorited node, so ensure that their favorites are kept on reset
         bool rolePreference =
-            isOneOf(config.device.role, meshtastic_Config_DeviceConfig_Role_CLIENT_BASE,
-                    meshtastic_Config_DeviceConfig_Role_ROUTER, meshtastic_Config_DeviceConfig_Role_ROUTER_LATE);
+            config.device.role == meshtastic_Config_DeviceConfig_Role_CLIENT_BASE ||
+            config.device.role == meshtastic_Config_DeviceConfig_Role_ROUTER ||
+            config.device.role == meshtastic_Config_DeviceConfig_Role_ROUTER_LATE;
+
         nodeDB->resetNodes(rolePreference ? rolePreference : r->nodedb_reset);
         reboot(DEFAULT_REBOOT_SECONDS);
         break;

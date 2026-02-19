@@ -16,7 +16,7 @@ ProcessMessage ZeroCostHopModule::handleReceived(const meshtastic_MeshPacket &mp
 
     const uint8_t hopsUsed = mp.hop_start - mp.hop_limit;
 
-    if (hopsUsed < 0 || hopsUsed > 1) {
+    if (hopsUsed != 0) {
         LOG_INFO("%s node id %lu hops used: %u not suitable for this module, skipping",tag, mp.from, hopsUsed);
         return ProcessMessage::CONTINUE;
     }
