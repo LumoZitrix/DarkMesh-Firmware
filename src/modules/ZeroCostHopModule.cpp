@@ -51,8 +51,7 @@ ProcessMessage ZeroCostHopModule::handleReceived(const meshtastic_MeshPacket &mp
 }
 
 bool ZeroCostHopModule::isInfrastructureRole(const meshtastic_Config_DeviceConfig_Role role) {
-    return IS_ONE_OF(role,
-                      meshtastic_Config_DeviceConfig_Role_ROUTER,
-                      meshtastic_Config_DeviceConfig_Role_ROUTER_LATE,
-                      meshtastic_Config_DeviceConfig_Role_CLIENT_BASE);
+    return role == meshtastic_Config_DeviceConfig_Role_ROUTER ||
+           role == meshtastic_Config_DeviceConfig_Role_ROUTER_LATE ||
+           role == meshtastic_Config_DeviceConfig_Role_CLIENT_BASE;
 }
