@@ -119,13 +119,22 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp) {
         if (p.payload.size == 1) {
             // only C = list
             std::string msg = "Favorites:\n";
+            int fav = 0;
             for (size_t i = 1; i < nodeDatabase.nodes.size(); i++) {
                 const auto &entry = nodeDatabase.nodes[i];
                 if (entry.is_favorite) {
                     msg += vformat("!%08x: '%s'\n", entry.num, entry.user.short_name);
+                    fav++;
+                }
+                if (fav == 5) {
+                    sendText(mp.from, 0, msg.c_str(), false);
+                    fav = 0;
+                    msg = "Favorites:\n";
                 }
             }
-            sendText(mp.from, 0, msg.c_str(), false);
+            if (fav > 0) {
+                sendText(mp.from, 0, msg.c_str(), false);
+            }
         } else if (p.payload.size == 10) {
             // C+<hex id>
             // parse hex id
