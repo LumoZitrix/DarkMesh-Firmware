@@ -53,7 +53,16 @@ bool PositionModule::handleReceivedProtobuf(const meshtastic_MeshPacket &mp, mes
     if (isFromUs(&mp)) {
         isLocal = true;
         if (config.position.fixed_position) {
-            LOG_DEBUG("Ignore incoming position update from myself except for time, because position.fixed_position is true");
+            const bool hasCoordinates = p.latitude_i != 0 || p.longitude_i != 0;
+            const bool isDynamicLocation = hasCoordinates && p.location_source != meshtastic_Position_LocSource_LOC_MANUAL;
+
+            if (isDynamicLocation) {
+                LOG_INFO("Disable position.fixed_position and accept dynamic local position update from client");
+                config.position.fixed_position = false;
+                nodeDB->saveToDisk(SEGMENT_CONFIG | SEGMENT_DEVICESTATE);
+                nodeDB->setLocalPosition(p);
+            } else {
+                LOG_DEBUG("Ignore incoming position update from myself except for time, because position.fixed_position is true");
 
 #ifdef T_WATCH_S3
             // Since we return early if position.fixed_position is true, set the T-Watch's RTC to the time received from the
