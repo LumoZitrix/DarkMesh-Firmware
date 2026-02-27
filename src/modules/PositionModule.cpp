@@ -17,6 +17,7 @@
 #include "sleep.h"
 #include "target_specific.h"
 #include <Throttle.h>
+#include <cmath> // fabsf
 
 PositionModule *positionModule;
 
@@ -53,18 +54,34 @@ bool PositionModule::handleReceivedProtobuf(const meshtastic_MeshPacket &mp, mes
     bool isLocal = false;
     if (isFromUs(&mp)) {
         isLocal = true;
+
         if (config.position.fixed_position) {
-            LOG_DEBUG("Ignore incoming position update from myself except for time, because position.fixed_position is true");
+            // Accept ONLY real phone GPS updates while fixed_position is true.
+            // Prefer has_* flags; fallback to non-zero coords only if both flags are missing (legacy clients).
+            const bool hasCoords = (p.has_latitude_i && p.has_longitude_i);
+            const bool legacyNonZeroCoords =
+                (!p.has_latitude_i && !p.has_longitude_i) && (p.latitude_i != 0 || p.longitude_i != 0);
+
+            const bool isPhoneGpsUpdate =
+                (p.location_source == meshtastic_Position_LocSource_LOC_EXTERNAL) && (hasCoords || legacyNonZeroCoords);
+
+            if (isPhoneGpsUpdate) {
+                LOG_DEBUG("Incoming phone GPS update overrides fixed position coordinates");
+                nodeDB->setLocalPosition(p);
+            } else {
+                LOG_DEBUG("Ignore incoming position update from myself except for time, because position.fixed_position is true");
 
 #ifdef T_WATCH_S3
-            // Since we return early if position.fixed_position is true, set the T-Watch's RTC to the time received from the
-            // client device here
-            if (p.time && channels.getByIndex(mp.channel).role == meshtastic_Channel_Role_PRIMARY) {
-                trySetRtc(p, isLocal, true);
-            }
+                // Since we return early if position.fixed_position is true, set the T-Watch's RTC to the time received from the
+                // client device here
+                if (p.time && channels.getByIndex(mp.channel).role == meshtastic_Channel_Role_PRIMARY) {
+                    trySetRtc(p, isLocal, true);
+                }
 #endif
 
-            nodeDB->setLocalPosition(p, true);
+                nodeDB->setLocalPosition(p, true);
+            }
+
             return false;
         } else {
             LOG_DEBUG("Incoming update from MYSELF");
@@ -390,7 +407,7 @@ void PositionModule::sendOurPosition(NodeNum dest, bool wantReplies, uint8_t cha
     }
 }
 
-#define RUNONCE_INTERVAL 5000;
+#define RUNONCE_INTERVAL 5000
 
 int32_t PositionModule::runOnce()
 {
@@ -482,14 +499,20 @@ struct SmartPosition PositionModule::getDistanceTraveledSinceLastSend(meshtastic
     float distanceTraveledSinceLastSend = GeoCoord::latLongToMeter(
         lastGpsLatitude * 1e-7, lastGpsLongitude * 1e-7, currentPosition.latitude_i * 1e-7, currentPosition.longitude_i * 1e-7);
 
-    return SmartPosition{.distanceTraveled = abs(distanceTraveledSinceLastSend),
+    const float absDistance = fabsf(distanceTraveledSinceLastSend);
+
+    return SmartPosition{.distanceTraveled = absDistance,
                          .distanceThreshold = distanceTravelThreshold,
-                         .hasTraveledOverThreshold = abs(distanceTraveledSinceLastSend) >= distanceTravelThreshold};
+                         .hasTraveledOverThreshold = absDistance >= distanceTravelThreshold};
 }
 
 void PositionModule::handleNewPosition()
 {
     meshtastic_NodeInfoLite *node = nodeDB->getMeshNode(nodeDB->getNodeNum());
+    if (node == nullptr) {
+        return;
+    }
+
     const meshtastic_NodeInfoLite *node2 = service->refreshLocalMeshNode(); // should guarantee there is now a position
     // We limit our GPS broadcasts to a max rate
     if (nodeDB->hasValidPosition(node2)) {
