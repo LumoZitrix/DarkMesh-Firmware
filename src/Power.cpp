@@ -802,14 +802,23 @@ uint16_t Power::getLastVoltageRead() {
 }
 
 bool Power::isBatteryCharging() {
+    if (powerStatus && powerStatus->isInitialized()) {
+        return powerStatus->getIsCharging();
+    }
     return batteryLevel ? batteryLevel->isCharging() : false;
 }
 
 bool Power::isUsbPowered() {
+    if (powerStatus && powerStatus->isInitialized()) {
+        return powerStatus->getHasUSB();
+    }
     return batteryLevel ? batteryLevel->isVbusIn() : false;
 }
 
 bool Power::isBatteryConnect() {
+    if (powerStatus && powerStatus->isInitialized()) {
+        return powerStatus->getHasBattery();
+    }
     return batteryLevel ? batteryLevel->isBatteryConnect() : false;
 }
 
