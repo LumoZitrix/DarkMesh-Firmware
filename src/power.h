@@ -117,6 +117,10 @@ class Power : private concurrency::OSThread
     virtual bool setup();
     virtual int32_t runOnce() override;
     void setStatusHandler(meshtastic::PowerStatus *handler) { statusHandler = handler; }
+    bool isBatteryCharging() const;
+    bool isUsbPowered() const;
+    bool isBatteryConnected() const;
+    bool isBatteryConnect() const { return isBatteryConnected(); } // Backward-compatible alias.
     const uint16_t OCV[11] = {OCV_ARRAY};
 
   protected:

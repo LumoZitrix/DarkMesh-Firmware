@@ -74,8 +74,9 @@ class PowerStatus : public Status
 
     bool matches(const PowerStatus *newStatus) const
     {
-        return (newStatus->getHasBattery() != hasBattery || newStatus->getHasUSB() != hasUSB ||
-                newStatus->getBatteryVoltageMv() != batteryVoltageMv);
+        return (newStatus->hasBattery != hasBattery || newStatus->hasUSB != hasUSB ||
+                newStatus->isCharging != isCharging || newStatus->batteryVoltageMv != batteryVoltageMv ||
+                newStatus->batteryChargePercent != batteryChargePercent);
     }
     int updateStatus(const PowerStatus *newStatus)
     {

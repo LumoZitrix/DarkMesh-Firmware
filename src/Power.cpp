@@ -593,6 +593,30 @@ Power::Power() : OSThread("Power")
 #endif
 }
 
+bool Power::isBatteryCharging() const
+{
+    if (statusHandler && statusHandler->isInitialized()) {
+        return statusHandler->getIsCharging();
+    }
+    return batteryLevel ? batteryLevel->isCharging() : false;
+}
+
+bool Power::isUsbPowered() const
+{
+    if (statusHandler && statusHandler->isInitialized()) {
+        return statusHandler->getHasUSB();
+    }
+    return batteryLevel ? batteryLevel->isVbusIn() : false;
+}
+
+bool Power::isBatteryConnected() const
+{
+    if (statusHandler && statusHandler->isInitialized()) {
+        return statusHandler->getHasBattery();
+    }
+    return batteryLevel ? batteryLevel->isBatteryConnect() : false;
+}
+
 bool Power::analogInit()
 {
 #ifdef EXT_PWR_DETECT
